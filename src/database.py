@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Koble til PostgreSQL
 conn = psycopg2.connect(
     host=os.getenv("DB_HOST"),
     port=os.getenv("DB_PORT"),
@@ -13,42 +12,26 @@ conn = psycopg2.connect(
     password=os.getenv("DB_PASSWORD")
 )
 
-cursor = conn.cursor()
 
-# Sett inn én testlokalitet
-cursor.execute(
-    """
-    INSERT INTO sites (
-        site_nr,
-        name,
-        latitude,
-        longitude,
-        capacity,
-        municipality_name,
-        county_name,
-        capacity_unit,
-        placement_type,
-        water_type
-    )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """,
-    (
-        10029,
-        "TUHOLMANE Ø",
-        59.371233,
-        5.216333,
-        2340.0,
-        "KARMØY",
-        "ROGALAND",
-        "TN",
-        "Offshore",
-        "Salt"
-    )
-)
+def save_sites(sites):
+    cursor = conn.cursor()
 
-conn.commit()
+    for site in sites:
+        cursor.execute(
+            """
+            INSERT INTO sites (site_nr, name, latitude, longitude)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (site_nr) DO NOTHING
+            """,
+            (
+                site["siteNr"],
+                site["name"],
+                site["latitude"],
+                site["longitude"]
+            )
+        )
 
-print("Lokalitet lagt til!")
+    conn.commit()
+    cursor.close()   
 
-cursor.close()
-conn.close()
+
