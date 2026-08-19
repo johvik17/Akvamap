@@ -17,17 +17,45 @@ def save_sites(sites):
     cursor = conn.cursor()
 
     for site in sites:
+        
         cursor.execute(
             """
-            INSERT INTO sites (site_nr, name, latitude, longitude)
-            VALUES (%s, %s, %s, %s)
-            ON CONFLICT (site_nr) DO NOTHING
-            """,
+            INSERT INTO sites (
+            site_nr,
+            name,
+            latitude,
+            longitude,
+            capacity,
+            municipality_name,
+            county_name,
+            capacity_unit,
+            placement_type,
+            water_type
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (site_nr) DO UPDATE
+        SET
+        name = EXCLUDED.name,
+        latitude = EXCLUDED.latitude,
+        longitude = EXCLUDED.longitude,
+        capacity = EXCLUDED.capacity,
+        municipality_name = EXCLUDED.municipality_name,
+        county_name = EXCLUDED.county_name,
+        capacity_unit = EXCLUDED.capacity_unit,
+        placement_type = EXCLUDED.placement_type,
+        water_type = EXCLUDED.water_type
+        """,
             (
                 site["siteNr"],
                 site["name"],
                 site["latitude"],
-                site["longitude"]
+                site["longitude"],
+                site["capacity"],
+                site["placement"]["municipalityName"],
+                site["placement"]["countyName"],
+                site["capacityUnitType"],
+                site["placementType"],
+                site["waterType"]
             )
         )
 
