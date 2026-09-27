@@ -61,5 +61,34 @@ def save_sites(sites):
 
     conn.commit()
     cursor.close()   
+    
 
+def get_sites_from_db():
+    conn = psycopg2.connect(
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD")
+    )
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT site_nr, name, latitude, longitude
+                FROM sites
+                ORDER BY site_nr
+            """)
+
+            return [
+                {
+                    "site_nr": row[0],
+                    "name": row[1],
+                    "latitude": row[2],
+                    "longitude": row[3]
+                }
+                for row in cursor.fetchall()
+            ]
+    finally:
+        conn.close()
 
