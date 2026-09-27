@@ -45,9 +45,24 @@ export default function App() {
           const popup = document.createElement('div')
           const title = document.createElement('strong')
           title.textContent = site.name
-          const description = document.createElement('div')
-          description.textContent = `Lokalitetsnummer: ${site.site_nr}`
-          popup.append(title, description)
+          popup.append(title)
+
+          const capacity = site.capacity == null
+            ? 'Ikke oppgitt'
+            : `${site.capacity} ${site.capacity_unit ?? ''}`.trim()
+
+          const details = [
+            ['Lokalitetsnummer', site.site_nr],
+            ['Kommune', site.municipality_name],
+            ['Fylke', site.county_name],
+            ['Kapasitet', capacity],
+          ]
+
+          for (const [label, value] of details) {
+            const line = document.createElement('div')
+            line.textContent = `${label}: ${value ?? 'Ikke oppgitt'}`
+            popup.append(line)
+          }
 
           L.circleMarker([lat, lng], {
             radius: 6,

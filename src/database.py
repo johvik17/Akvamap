@@ -75,7 +75,9 @@ def get_sites_from_db():
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT site_nr, name, latitude, longitude
+                SELECT site_nr, name, latitude, longitude,
+                       municipality_name, county_name,
+                       capacity, capacity_unit
                 FROM sites
                 ORDER BY site_nr
             """)
@@ -85,7 +87,11 @@ def get_sites_from_db():
                     "site_nr": row[0],
                     "name": row[1],
                     "latitude": row[2],
-                    "longitude": row[3]
+                    "longitude": row[3],
+                    "municipality_name": row[4],
+                    "county_name": row[5],
+                    "capacity": row[6],
+                    "capacity_unit": row[7]
                 }
                 for row in cursor.fetchall()
             ]
